@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SellerDaoJDBC implements SellerDao {
-   
 
     private final Connection con;
 
@@ -73,7 +72,6 @@ public class SellerDaoJDBC implements SellerDao {
             pst.setDate(3, (Date) obj.getBirthDate());
             pst.setDouble(4, obj.getBaseSalary());
             pst.setInt(5, obj.getDepartment().getId());
-
             pst.setInt(6, obj.getId());
 
             int rowsAffected = pst.executeUpdate();
