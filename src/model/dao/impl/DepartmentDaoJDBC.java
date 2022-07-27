@@ -106,6 +106,26 @@ public class DepartmentDaoJDBC implements DepartmentDao {
     }
 
     @Override
+    public void deleteByName(String name) {
+        PreparedStatement pst = null;
+        try {
+            pst = con.prepareStatement("DELETE FROM department WHERE Name = ?");
+
+            pst.setString(1, name);
+
+            int rowsAffected = pst.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DbException("ERROR: There's no department with this name: " + name);
+            }
+
+        } catch (SQLException e) {
+            throw new DbIntegrityException(e.getMessage());
+        } finally {
+            DB.closeStatement(pst);
+        }
+    }
+
+    @Override
     public Department findById(int id) {
         PreparedStatement pst = null;
         ResultSet rs = null;

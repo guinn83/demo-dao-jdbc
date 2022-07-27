@@ -12,6 +12,8 @@ public interface DepartmentDao {
 
     void deleteById(int id);
 
+    void deleteByName(String name);
+
     Department findById(int id);
 
     List<Department> findAll();

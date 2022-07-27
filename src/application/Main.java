@@ -40,7 +40,7 @@ public class Main {
             System.out.println(e.getMessage());
         }
 
-        System.out.println("\n=== TEST 5: department delete ===");
+        System.out.println("\n=== TEST 5: department deleteById ===");
         Scanner sc = new Scanner(System.in);
         boolean exit = false;
         do {
