@@ -24,8 +24,19 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public void insert(Seller obj) {
         PreparedStatement st = null;
-
+        ResultSet rs = null;
         try{
+            st = con.prepareStatement("" +
+                    "SELECT Email " +
+                    "FROM seller " +
+                    "WHERE Email = ?");
+
+            st.setString(1, obj.getEmail());
+            rs = st.executeQuery();
+            if (rs.next()) {
+                throw new DbException("ERROR: Seller already exists!");
+            }
+
             st = con.prepareStatement("" +
                     "INSERT INTO seller " +
                     "(Name, Email, BirthDate, BaseSalary, DepartmentId) " +
@@ -41,7 +52,7 @@ public class SellerDaoJDBC implements SellerDao {
             int rowsAffected = st.executeUpdate();
 
             if (rowsAffected > 0) {
-                ResultSet rs = st.getGeneratedKeys();
+                rs = st.getGeneratedKeys();
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     obj.setId(id);
@@ -89,15 +100,14 @@ public class SellerDaoJDBC implements SellerDao {
     public void deleteById(int id) {
         PreparedStatement pst = null;
         try {
-            pst = con.prepareStatement("" +
-                    "DELETE FROM seller " +
-                    "WHERE Id = ?");
+            pst = con.prepareStatement("DELETE FROM seller WHERE Id = ?");
 
             pst.setInt(1, id);
 
             int rowsAffected = pst.executeUpdate();
-
-            System.out.println("Done! Deleted row : " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new DbException("ERROR: There's no seller with this Id: " + id);
+            }
 
         } catch (SQLException e) {
             throw new DbIntegrityException(e.getMessage());

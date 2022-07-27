@@ -21,8 +21,19 @@ public class DepartmentDaoJDBC implements DepartmentDao {
     @Override
     public void insert(Department obj) {
         PreparedStatement st = null;
-
+        ResultSet rs = null;
         try{
+            st = con.prepareStatement("" +
+                    "SELECT Name " +
+                    "FROM department " +
+                    "WHERE Name = ?");
+
+            st.setString(1, obj.getName());
+            rs = st.executeQuery();
+            if (rs.next()) {
+                throw new DbException("ERROR: Department already exists!");
+            }
+
             st = con.prepareStatement("" +
                     "INSERT INTO department " +
                     "(Name) " +
@@ -34,14 +45,14 @@ public class DepartmentDaoJDBC implements DepartmentDao {
             int rowsAffected = st.executeUpdate();
 
             if (rowsAffected > 0) {
-                ResultSet rs = st.getGeneratedKeys();
+                rs = st.getGeneratedKeys();
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     obj.setId(id);
                 }
                 DB.closeResultSet(rs);
             } else {
-                throw new DbException("No rows affected");
+                throw new DbException("ERROR: No rows affected");
             }
 
         } catch (SQLException e) {
@@ -78,15 +89,14 @@ public class DepartmentDaoJDBC implements DepartmentDao {
     public void deleteById(int id) {
         PreparedStatement pst = null;
         try {
-            pst = con.prepareStatement("" +
-                    "DELETE FROM department " +
-                    "WHERE Id = ?");
+            pst = con.prepareStatement("DELETE FROM department WHERE Id = ?");
 
             pst.setInt(1, id);
 
             int rowsAffected = pst.executeUpdate();
-
-            System.out.println("Done! Deleted row : " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new DbException("ERROR: There's no department with this Id: " + id);
+            }
 
         } catch (SQLException e) {
             throw new DbIntegrityException(e.getMessage());
